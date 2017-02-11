@@ -12,11 +12,11 @@ solve(Pizza, R, C, L, H, Vars) :-
     
     buildDomainVariables(1, MaxSlices, R, C, H, Vars, AreaOccupied),
     AreaOccupied #=< TotalArea,
-    
+
     buildRectangles(Vars, Rectangles),
     disjoint2(Rectangles),                          % each cell of the pizza must be included in at most one slice
 
-    % minimumIngredients(Pizza, R, C, L, H, Vars),    % each slice must contain at least L cells of mushroom and L cells of tomato
+    minimumIngredients(Pizza, R, C, L, H, Vars),    % each slice must contain at least L cells of mushroom and L cells of tomato
 
     labeling([ff, maximize(AreaOccupied)], Vars),
     printSolution(Vars).
@@ -24,9 +24,13 @@ solve(Pizza, R, C, L, H, Vars) :-
 
 buildDomainVariables(MaxSlices, MaxSlices, _, _, _, [], 0).
 buildDomainVariables(N, MaxSlices, R, C, H, [Xi, Length, Yi, Height | Vars], AreaOccupied) :-
-    domain([Xi, Length], 1, C),
-    domain([Yi, Height], 1, R),
+    domain([Xi], 1, C),
+    domain([Length], 0, C),
+    domain([Yi], 1, R),
+    domain([Height], 0, R),
     Length*Height #=< H,                            % total area of each slice must be at most H
+    Xi + Length -1 #=< C,
+    Yi + Length -1 #=< R,
     N1 is N+1,
     buildDomainVariables(N1, MaxSlices, R, C, H, Vars, AreaOccup),
     AreaOccupied #= AreaOccup + (Length*Height).
@@ -41,7 +45,13 @@ minimumIngredients(_, _, _, _, _, []).
 minimumIngredients(Pizza, R, C, L, H, [Xi, Length, Yi, Height | Vars]) :-
     getGrid(1, 1, R, C, Xi, Length, Yi, Height, Grid),
     scalar_product(Pizza, Grid, #=, Value),
-    Value #>= L #/\ Value #=< H - L,
+    Min is L,
+    Max is H-L,
+    (
+        (Length #= 0 #/\ Height #= 0)
+        #\/
+        (Length #\= 0 #/\ Height #\= 0 #/\ Value #>= Min #/\ Value #=< Max)
+    ),
     minimumIngredients(Pizza, R, C, L, H, Vars).
 
 
@@ -51,13 +61,13 @@ getGrid(Line, _, R, _, _, _, _, _, []) :-
 getGrid(Line, Column, R, C, Xi, Length, Yi, Height, Grid) :-
     Column =:= C+1,
     Line1 is Line+1,
-    getGrid(Line1, 0, R, C, Xi, Length, Yi, Height, Grid).
+    getGrid(Line1, 1, R, C, Xi, Length, Yi, Height, Grid).
 
 getGrid(Line, Column, R, C, Xi, Length, Yi, Height, [B | Grid]) :-
     (
-        Line #>= Yi #/\ Line #<= Yi + Height - 1
+        Line #>= Yi #/\ Line #< Yi+Height
         #/\
-        Column #>= Xi #/\ Column #<= Xi + Length - 1
+        Column #>= Xi #/\ Column #< Xi+Length
     ) #<=> B,
     Column1 is Column+1,
     getGrid(Line, Column1, R, C, Xi, Length, Yi, Height, Grid).
