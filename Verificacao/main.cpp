@@ -5,6 +5,8 @@
 #include <sstream>
 
 using namespace std;
+int minIng;
+int maxCells;
 
 void debugInput(int rows, int  cols, int  minIng, int maxCells,vector<vector<char>> pizza) {
 
@@ -24,12 +26,16 @@ bool checkSlice(int xi, int yi, int xf, int yf, vector<vector<char>>* pizza, vec
 	//Return true if valid
 	int tomatoeCount = 0;
 	int mushroomCount = 0;
+	int counter = 0;
 	for (int x = xi; x <= xf; x++){
 		for (int y = yi; y <= yf; y++) {
 			if ((*checkVec)[x][y]) {
 				return false;
 			}
 			(*checkVec)[x][y] = true;
+
+			counter++;
+
 			if ((*pizza)[x][y] == 'T') {
 				tomatoeCount++;
 			}
@@ -38,7 +44,13 @@ bool checkSlice(int xi, int yi, int xf, int yf, vector<vector<char>>* pizza, vec
 			}
 		}
 	};
-
+	
+	if (counter > maxCells)
+		return false;
+	
+	if (tomatoeCount < minIng || mushroomCount < minIng)
+		return false;
+	
 	return true;
 }
 
@@ -51,7 +63,7 @@ int main() {
 	//Input data---------------------------------------------------------------------------------------
 	vector<vector<char>> pizza;
 	vector<vector<bool>> checkVec;
-	int rows, cols, minIng, maxCells;
+	int rows, cols;
 
 	cout << "Input File [Same directory with extension]: ";
 	cin >> iFileName;
@@ -152,6 +164,7 @@ int main() {
 
 	cout << "Data Read, Closing File..." << endl;
 	outputFile.close();
+	cout << "Everything seems alright!" << endl;
 	system("pause");
 	return 0;
 }
