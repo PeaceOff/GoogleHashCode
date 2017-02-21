@@ -5,11 +5,12 @@
 %disjoint2(Rectangles)
 
 
+
 solve(Pizza, R, C, L, H, Vars) :-
     MinSliceSize is 2*L,
     TotalArea is R*C,
     MaxSlices is floor(TotalArea / MinSliceSize),
-    
+
     buildDomainVariables(1, MaxSlices, R, C, H, Vars, AreaOccupied),
     AreaOccupied #=< TotalArea,
 
@@ -18,7 +19,7 @@ solve(Pizza, R, C, L, H, Vars) :-
 
     minimumIngredients(Pizza, R, C, L, H, Vars),    % each slice must contain at least L cells of mushroom and L cells of tomato
 
-    labeling([ff, maximize(AreaOccupied)], Vars),
+    labeling([ff, time_out(20000, _), maximize(AreaOccupied)], Vars),
     printSolution(Vars).
 
 
@@ -75,8 +76,9 @@ getGrid(Line, Column, R, C, Xi, Length, Yi, Height, [B | Grid]) :-
 
 printSolution([]).
 printSolution([Xi, Length, Yi, Height | Vars]) :-
-    Xf is Xi + Length - 1,
-    Yf is Yi + Height - 1,
-    format('~w ~w ~w ~w~n', [Yi, Yf, Xi, Xf]),
+    Xf is Xi + Length - 2,
+    Yf is Yi + Height - 2,
+    Xii is Xi -1,
+    Yii is Yi -1,
+    format('~w ~w ~w ~w~n', [Yii,  Xii, Yf, Xf]),
     printSolution(Vars).
-
