@@ -1,5 +1,11 @@
 # GoogleHashCode
 
-Our solution of the Google Hash Code 2017 challenge
+Our solution of the Google Hash Code 2017 challenge.
 
-Includes the solution for the pratice problem as well as the online qualification round
+
+###Team Members
+
+* [David Azevedo](https://github.com/PeaceOff) 
+* [João Ferreira](https://github.com/joaocsf)
+* [João Barbosa](https://github.com/bmpj13)
+* [José Martins](https://github.com/JoseLuisMartins) 
